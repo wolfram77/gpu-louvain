@@ -8,6 +8,7 @@ int main(int argc, char *argv[]) {
 	float minGain;
 	bool isVerbose;
 	parseCommandLineArgs(argc, argv, &minGain, &isVerbose, &fileName);
+	printf("Using graph %s ...\n", fileName);
 
     auto hostStructures = readInputData(fileName);
     device_structures deviceStructures;
@@ -34,13 +35,14 @@ int main(int argc, char *argv[]) {
 	}
 	int V;
 	HANDLE_ERROR(cudaMemcpy(&V, deviceStructures.V, sizeof(int), cudaMemcpyDeviceToHost));
-	printf("%f\n", calculateModularity(V, hostStructures.M, deviceStructures));
+	printf("modularity: %f\n", calculateModularity(V, hostStructures.M, deviceStructures));
 	HANDLE_ERROR(cudaEventRecord(stop, 0));
 	HANDLE_ERROR(cudaEventSynchronize(stop));
 	float algorithmTime;
 	HANDLE_ERROR(cudaEventElapsedTime(&algorithmTime, start, stop));
-	printf("%f %f\n", algorithmTime, algorithmTime + memoryTime);
+	printf("algorithm_time: %f all_time: %f\n", algorithmTime, algorithmTime + memoryTime);
 	if (isVerbose)
 		printOriginalToCommunity(deviceStructures, hostStructures);
 	deleteStructures(hostStructures, deviceStructures, aggregationPhaseStructures);
+	printf("\n");
 }
