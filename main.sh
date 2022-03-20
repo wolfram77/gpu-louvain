@@ -12,10 +12,6 @@ cd $src
 # Run
 make all
 mv gpulouvain a.out
-stdbuf --output=L ./a.out -f ~/data/min-1DeadEnd_symmetric.mtx      -g 0.000001 2>&1 | tee -a "$out"
-stdbuf --output=L ./a.out -f ~/data/min-2SCC_symmetric.mtx          -g 0.000001 2>&1 | tee -a "$out"
-stdbuf --output=L ./a.out -f ~/data/min-4SCC_symmetric.mtx          -g 0.000001 2>&1 | tee -a "$out"
-stdbuf --output=L ./a.out -f ~/data/min-NvgraphEx_symmetric.mtx     -g 0.000001 2>&1 | tee -a "$out"
 stdbuf --output=L ./a.out -f ~/data/web-Stanford_symmetric.mtx      -g 0.000001 2>&1 | tee -a "$out"
 stdbuf --output=L ./a.out -f ~/data/web-BerkStan_symmetric.mtx      -g 0.000001 2>&1 | tee -a "$out"
 stdbuf --output=L ./a.out -f ~/data/web-Google_symmetric.mtx        -g 0.000001 2>&1 | tee -a "$out"
@@ -33,3 +29,15 @@ stdbuf --output=L ./a.out -f ~/data/italy_osm_symmetric.mtx         -g 0.000001 
 stdbuf --output=L ./a.out -f ~/data/great-britain_osm_symmetric.mtx -g 0.000001 2>&1 | tee -a "$out"
 stdbuf --output=L ./a.out -f ~/data/germany_osm_symmetric.mtx       -g 0.000001 2>&1 | tee -a "$out"
 stdbuf --output=L ./a.out -f ~/data/asia_osm_symmetric.mtx          -g 0.000001 2>&1 | tee -a "$out"
+
+# stdbuf --output=L ./a.out -f ~/data/arabic-2005_symmetric.mtx       -g 0.000001 2>&1 | tee -a "$out"
+# stdbuf --output=L ./a.out -f ~/data/uk-2005_symmetric.mtx           -g 0.000001 2>&1 | tee -a "$out"
+# stdbuf --output=L ./a.out -f ~/data/it-2004_symmetric.mtx           -g 0.000001 2>&1 | tee -a "$out"
+# stdbuf --output=L ./a.out -f ~/data/soc-Epinions1_symmetric.mtx     -g 0.000001 2>&1 | tee -a "$out"
+# stdbuf --output=L ./a.out -f ~/data/soc-LiveJournal1_symmetric.mtx  -g 0.000001 2>&1 | tee -a "$out"
+# stdbuf --output=L ./a.out -f ~/data/wiki-Talk_symmetric.mtx         -g 0.000001 2>&1 | tee -a "$out"
+# stdbuf --output=L ./a.out -f ~/data/cit-Patents_symmetric.mtx       -g 0.000001 2>&1 | tee -a "$out"
+# stdbuf --output=L ./a.out -f ~/data/coPapersDBLP_symmetric.mtx      -g 0.000001 2>&1 | tee -a "$out"
+# stdbuf --output=L ./a.out -f ~/data/amazon-2008_symmetric.mtx       -g 0.000001 2>&1 | tee -a "$out"
+# stdbuf --output=L ./a.out -f ~/data/italy_osm_symmetric.mtx         -g 0.000001 2>&1 | tee -a "$out"
+# stdbuf --output=L ./a.out -f ~/data/Linux_call_graph_symmetric.mtx  -g 0.000001 2>&1 | tee -a "$out"
