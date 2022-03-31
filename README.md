@@ -1,10 +1,11 @@
 Goal of this project was to implement Community detection algorithm (using Louvain method)
 based on a paper: [Community Detection on the GPU].
 
-> For the program output, check these [logs].
+> For the program output, check these [logs] or [sheets].
 
 [Community Detection on the GPU]: http://dspace.uib.no/bitstream/handle/1956/16753/PaperIII.pdf
 [logs]: https://gist.github.com/wolfram77/5d23db0a60246f9111b141c133360cb8
+[sheets]: https://docs.google.com/spreadsheets/d/1goL5Mv4i0G9phwacjFDve3FJ1iNa7Qs6E1SdnwDHIcY/edit?usp=sharing
 
 <br>
 
