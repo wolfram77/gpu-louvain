@@ -31,7 +31,7 @@ auto readEdges(char *filename) {
 	// read edges
   while (getline(file, ln)) {
     int u, v;
-    ls = stringstream(ln);
+    ls = istringstream(ln);
     if (!(ls >> u >> v)) break;
 		--u; --v;
 		edges[u].push_back(v);
@@ -43,18 +43,17 @@ auto readEdges(char *filename) {
 		auto it = unique(edges[u].begin(), edges[u].end());
 		edges[u].resize(it - edges[u].begin());
 	}
+	file.close();
 	return edges;
 }
 
 
 
 host_structures readInputData(char *fileName) {
-	vector<vector<int>> edges = readEdges(filename);
+	vector<vector<int>> edges = readEdges(fileName);
 	int V = edges.size(), E = 0;
 	for (int u=0; u<V; u++)
 		E += edges[u].size();
-	int v1, v2;
-	float w;
 	host_structures hostStructures;
 	hostStructures.originalV = V;
 	hostStructures.V = V;
@@ -65,7 +64,6 @@ host_structures readInputData(char *fileName) {
 
 	std::vector<std::vector<std::pair<int, float>>> neighbours(V);
 	// TODO: here is assumption that graph is undirected
-	int aux = E;
 	for (int v1 = 0; v1 < V; v1++) {
 		for (int v2 : edges[v1]) {
 			float w = 1;  // assume weight = 1
@@ -94,7 +92,6 @@ host_structures readInputData(char *fileName) {
 		}
 	}
 	hostStructures.edgesIndex[V] = E;
-	file.close();
 	return hostStructures;
 }
 
