@@ -5,60 +5,97 @@
 #include <fstream>
 #include <getopt.h>
 #include <sstream>
+#include <algorithm>
+
+using std::vector;
+using std::string;
+using std::fstream;
+using std::istringstream;
+using std::getline;
+using std::sort;
+using std::unique;
+
+
+
+
+auto readEdges(char *filename) {
+	fstream file;
+	file.open(filename);
+	string ln;
+	do { getline(file, ln); }
+	while (ln[0]=='%');
+	istringstream ls(ln);
+	int V, E;
+	ls >> V >> V >> E;
+	vector<vector<int>> edges(V);
+	// read edges
+  while (getline(file, ln)) {
+    int u, v;
+    ls = stringstream(ln);
+    if (!(ls >> u >> v)) break;
+		--u; --v;
+		edges[u].push_back(v);
+		edges[v].push_back(u);  // assume graph is symmetric
+  }
+	// remove duplicate edges
+	for (int u=0; u<V; u++) {
+		sort(edges[u].begin(), edges[u].end());
+		auto it = unique(edges[u].begin(), edges[u].end());
+		edges[u].resize(it - edges[u].begin());
+	}
+	return edges;
+}
+
+
 
 host_structures readInputData(char *fileName) {
-	std::fstream file;
-	file.open(fileName);
-    int V, E;
-	std::string s;
-	do {
-		std::getline(file, s);
-	} while (s[0] == '%');
-	std::istringstream stream(s);
-    stream >> V >> V >> E;
-    int v1, v2;
-    float w;
-    host_structures hostStructures;
+	vector<vector<int>> edges = readEdges(filename);
+	int V = edges.size(), E = 0;
+	for (int u=0; u<V; u++)
+		E += edges[u].size();
+	int v1, v2;
+	float w;
+	host_structures hostStructures;
 	hostStructures.originalV = V;
 	hostStructures.V = V;
-    HANDLE_ERROR(cudaHostAlloc((void**)&hostStructures.vertexCommunity, V * sizeof(int), cudaHostAllocDefault));
-    HANDLE_ERROR(cudaHostAlloc((void**)&hostStructures.communityWeight, V * sizeof(float), cudaHostAllocDefault));
-    HANDLE_ERROR(cudaHostAlloc((void**)&hostStructures.edgesIndex, (V + 1) * sizeof(int), cudaHostAllocDefault));
+	HANDLE_ERROR(cudaHostAlloc((void**)&hostStructures.vertexCommunity, V * sizeof(int), cudaHostAllocDefault));
+	HANDLE_ERROR(cudaHostAlloc((void**)&hostStructures.communityWeight, V * sizeof(float), cudaHostAllocDefault));
+	HANDLE_ERROR(cudaHostAlloc((void**)&hostStructures.edgesIndex, (V + 1) * sizeof(int), cudaHostAllocDefault));
 	HANDLE_ERROR(cudaHostAlloc((void**)&hostStructures.originalToCommunity, V * sizeof(int), cudaHostAllocDefault));
 
-    std::vector<std::vector<std::pair<int, float>>> neighbours(V);
-    // TODO: here is assumption that graph is undirected
-    int aux = E;
-    for (int i = 0; i < aux; i++) {
-        file >> v1 >> v2 >> w;
-        v1--;
-        v2--;
-		hostStructures.communityWeight[v1] += w;
-        neighbours[v1].emplace_back(v2, w);
-        if (v1 != v2) {
-            E++;
-			hostStructures.communityWeight[v2] += w;
-            neighbours[v2].emplace_back(v1, w);
+	std::vector<std::vector<std::pair<int, float>>> neighbours(V);
+	// TODO: here is assumption that graph is undirected
+	int aux = E;
+	for (int v1 = 0; v1 < V; v1++) {
+		for (int v2 : edges[v1]) {
+			float w = 1;  // assume weight = 1
+			hostStructures.communityWeight[v1] += w;
+			neighbours[v1].emplace_back(v2, w);
+			// if (v1 != v2) {
+			// 	E++;
+			// 	hostStructures.communityWeight[v2] += w;
+			// 	neighbours[v2].emplace_back(v1, w);
+			// 	hostStructures.M += w;
+			// }
 			hostStructures.M += w;
-        }
-		hostStructures.M += w;
-    }
-    hostStructures.M /= 2;
-    HANDLE_ERROR(cudaHostAlloc((void**)&hostStructures.edges, E * sizeof(int), cudaHostAllocDefault));
-    HANDLE_ERROR(cudaHostAlloc((void**)&hostStructures.weights, E * sizeof(float), cudaHostAllocDefault));
+		}
+	}
+	hostStructures.M /= 2;
+	HANDLE_ERROR(cudaHostAlloc((void**)&hostStructures.edges, E * sizeof(int), cudaHostAllocDefault));
+	HANDLE_ERROR(cudaHostAlloc((void**)&hostStructures.weights, E * sizeof(float), cudaHostAllocDefault));
 	hostStructures.E = E;
-    int index = 0;
-    for (int v = 0; v < V; v++) {
-		hostStructures.edgesIndex[v] = index;
-        for (auto & it : neighbours[v]) {
-			hostStructures.edges[index] = it.first;
+	int index = 0;
+	for (int v = 0; v < V; v++) {
+	hostStructures.edgesIndex[v] = index;
+		for (auto & it : neighbours[v]) {
+			hostStructures.edges[index]   = it.first;
 			hostStructures.weights[index] = it.second;
-            index++;
-        }
-    }
+			index++;
+		}
+	}
 	hostStructures.edgesIndex[V] = E;
-    file.close();
-    return hostStructures;
+	file.close();
+	return hostStructures;
 }
 
 void copyStructures(host_structures& hostStructures, device_structures& deviceStructures,
